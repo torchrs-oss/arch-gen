@@ -1,3 +1,4 @@
+use arboard::Clipboard;
 use muda::{AboutMetadata, Menu, MenuEvent, PredefinedMenuItem, Submenu};
 use tao::{
     dpi::LogicalSize,
@@ -89,6 +90,14 @@ fn main() -> wry::Result<()> {
     let _webview = WebViewBuilder::new()
         .with_html(&html)
         .with_devtools(cfg!(debug_assertions))
+        .with_ipc_handler(|req| {
+            let body = req.body();
+            if let Some(text) = body.strip_prefix("clipboard:") {
+                if let Ok(mut cb) = Clipboard::new() {
+                    let _ = cb.set_text(text);
+                }
+            }
+        })
         .build(&window)?;
 
     event_loop.run(move |event, _, control_flow| {

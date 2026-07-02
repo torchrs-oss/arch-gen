@@ -710,16 +710,12 @@ function doRandomize() {
 
 function doCopy() {
   if (!rawPrompt) return;
-  navigator.clipboard.writeText(rawPrompt).then(() => {
-    const toast = document.getElementById('toast');
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 2000);
-    document.getElementById('statusMsg').className = 'status-msg ok';
-    document.getElementById('statusMsg').textContent = '✓ Copied to clipboard';
-  }).catch(() => {
-    document.getElementById('statusMsg').className = 'status-msg';
-    document.getElementById('statusMsg').textContent = 'Clipboard unavailable';
-  });
+  window.ipc.postMessage('clipboard:' + rawPrompt);
+  const toast = document.getElementById('toast');
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2000);
+  document.getElementById('statusMsg').className = 'status-msg ok';
+  document.getElementById('statusMsg').textContent = '✓ Copied to clipboard';
 }
 
 function esc(s) {
