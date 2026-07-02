@@ -350,7 +350,7 @@ a:hover { text-decoration: underline; }
     <div class="logo">ARCH-GEN</div>
     <h1>Architecture Decision Randomizer</h1>
     <p class="subtitle">
-      A native macOS app that randomly generates absurd (and occasionally brilliant)
+      A native desktop app that randomly generates absurd (and occasionally brilliant)
       architecture mandates for refactoring projects. Because management said so.
     </p>
     <p class="stats">
@@ -359,14 +359,17 @@ a:hover { text-decoration: underline; }
   </div>
 
   <div class="install">
-    <h2>Install (macOS, Apple Silicon)</h2>
+    <h2 id="installTitle">Install</h2>
     <div class="install-cmd" onclick="copyInstall(this)">
       curl -fsSL https://data.torch.rs/arch-gen/install.sh | bash
       <button class="copy-btn" onclick="event.stopPropagation(); copyInstall(this.parentElement)">Copy</button>
     </div>
-    <p class="install-note">
-      Or <a href="ArchGen-macos-arm64.tar.gz">download the .tar.gz</a> directly (871 KB)
+    <p class="install-note" id="installNote">
+      Or download directly:
+      <a href="ArchGen-macos-arm64.tar.gz">macOS (arm64)</a> ·
+      <a href="ArchGen-linux-x86_64.tar.gz">Linux (x86_64)</a>
     </p>
+    <p class="install-note" id="platformMsg" style="margin-top:8px;"></p>
   </div>
 
   <div class="screenshot">
@@ -488,7 +491,7 @@ a:hover { text-decoration: underline; }
       <li><strong style="color:var(--text)">Rust</strong> + <strong style="color:var(--text)">wry</strong> (WebKit webview, same engine as Tauri)</li>
       <li>Vanilla HTML/CSS/JS frontend &mdash; zero npm dependencies</li>
       <li>3,049 options compiled into the binary from a single JSON dataset</li>
-      <li>Native macOS .app bundle, 871 KB compressed</li>
+      <li>Native macOS .app bundle &amp; Linux binary</li>
     </ul>
   </div>
 
@@ -511,6 +514,25 @@ function copyInstall(el) {
     }, 2000);
   });
 }
+
+(function detectPlatform() {
+  const ua = navigator.userAgent;
+  const title = document.getElementById('installTitle');
+  const msg = document.getElementById('platformMsg');
+  if (/Mac/.test(ua)) {
+    title.textContent = 'Install (macOS, Apple Silicon)';
+    msg.style.color = 'var(--green)';
+    msg.textContent = '✓ Detected macOS — the install script will set up the .app bundle for you.';
+  } else if (/Linux/.test(ua)) {
+    title.textContent = 'Install (Linux, x86_64)';
+    msg.style.color = 'var(--green)';
+    msg.textContent = '✓ Detected Linux — the install script will place the binary in ~/.local/bin.';
+  } else if (/Win/.test(ua)) {
+    title.textContent = 'Install (macOS & Linux)';
+    msg.style.color = 'var(--yellow)';
+    msg.textContent = 'Windows is not currently supported. Runs on macOS (arm64) and Linux (x86_64).';
+  }
+})();
 </script>
 </body>
 </html>
