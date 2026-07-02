@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #060d1a;
+  --bg-card: #0c1829;
+  --bg-card-alt: #101e34;
+  --bg-input: #08111f;
+  --border: rgba(255, 255, 255, 0.055);
+  --border-light: rgba(255, 255, 255, 0.09);
+  --border-focus: rgba(34, 211, 238, 0.45);
+  --text: #dce4f0;
+  --text-muted: #5e7491;
+  --text-dim: #334155;
+  --accent: #22d3ee;
+  --accent-soft: rgba(34, 211, 238, 0.12);
+  --indigo: #818cf8;
+  --yellow: #fbbf24;
+  --yellow-soft: rgba(251, 191, 36, 0.12);
+  --green: #34d399;
+  --green-soft: rgba(52, 211, 153, 0.1);
+  --red: #f87171;
+  --red-soft: rgba(248, 113, 113, 0.1);
+  --radius: 16px;
+  --radius-sm: 10px;
+  --radius-xs: 6px;
+}
+
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+  user-select: none;
+}
+
+/* ── Layout ── */
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  padding: 14px 16px 10px;
+  gap: 10px;
+}
+
+/* ── Header ── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2px;
+}
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.header-logo {
+  background: linear-gradient(135deg, var(--accent), var(--indigo));
+  color: #fff;
+  font-weight: 800;
+  font-size: 11px;
+  padding: 5px 12px;
+  border-radius: var(--radius-xs);
+  letter-spacing: 1.5px;
+}
+.header-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+.header-right {
+  font-size: 11px;
+  color: var(--text-dim);
+  letter-spacing: 0.5px;
+}
+
+/* ── Project bar ── */
+.project-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 8px 14px;
+}
+.project-bar label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  white-space: nowrap;
+}
+.project-input {
+  flex: 1;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  padding: 7px 12px;
+  color: var(--text);
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.project-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+.project-input::placeholder { color: var(--text-dim); }
+
+/* ── Buttons ── */
+.actions { display: flex; gap: 6px; }
+.btn {
+  padding: 7px 16px;
+  border: none;
+  border-radius: var(--radius-xs);
+  font-size: 11px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  white-space: nowrap;
+}
+.btn-primary {
+  background: linear-gradient(135deg, #22d3ee, #6366f1);
+  color: #fff;
+  box-shadow: 0 0 24px rgba(34,211,238,0.2), 0 2px 8px rgba(0,0,0,0.3);
+  padding: 7px 22px;
+}
+.btn-primary:hover {
+  box-shadow: 0 0 32px rgba(34,211,238,0.35), 0 4px 12px rgba(0,0,0,0.3);
+  transform: translateY(-1px);
+}
+.btn-primary:active { transform: translateY(0); box-shadow: 0 0 16px rgba(34,211,238,0.15); }
+.btn-secondary {
+  background: var(--bg-card-alt);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+}
+.btn-secondary:hover { color: var(--text); border-color: var(--border-light); background: #162040; }
+.btn-accent {
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid rgba(34,211,238,0.2);
+}
+.btn-accent:hover { background: var(--accent-soft); }
+
+/* ── Main grid ── */
+.main {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 310px 1fr;
+  gap: 10px;
+  min-height: 0;
+}
+
+/* ── Card ── */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px 10px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.card-title {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.card-title .dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 6px var(--accent);
+}
+.card-badge {
+  font-size: 10px;
+  padding: 2px 9px;
+  border-radius: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+.badge-cyan { background: var(--accent-soft); color: var(--accent); }
+.badge-green { background: var(--green-soft); color: var(--green); }
+.badge-yellow { background: var(--yellow-soft); color: var(--yellow); }
+
+.card-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 6px;
+}
+.card-body::-webkit-scrollbar { width: 5px; }
+.card-body::-webkit-scrollbar-track { background: transparent; }
+.card-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 3px; }
+.card-body::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.15); }
+
+/* ── Category list ── */
+.category-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.category-item:hover { background: rgba(255,255,255,0.025); }
+.category-item.disabled { opacity: 0.35; }
+.category-item .cat-label {
+  flex: 1;
+  font-size: 12.5px;
+  font-weight: 500;
+}
+.category-item .cat-count {
+  font-size: 10px;
+  color: var(--text-dim);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Toggle switch ── */
+.toggle {
+  width: 34px;
+  height: 18px;
+  background: #1e2d48;
+  border-radius: 9px;
+  position: relative;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+.toggle.on { background: var(--accent); }
+.toggle::after {
+  content: '';
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: #fff;
+  position: absolute;
+  top: 2px; left: 2px;
+  transition: transform 0.2s cubic-bezier(0.4,0,0.2,1);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+.toggle.on::after { transform: translateX(16px); }
+
+/* ── Prompt display ── */
+.prompt-body {
+  padding: 16px 20px;
+  user-select: text;
+}
+.prompt-body .decree {
+  color: var(--red);
+  font-weight: 600;
+  font-size: 13px;
+  padding: 14px 16px;
+  background: var(--red-soft);
+  border-radius: var(--radius-sm);
+  margin-bottom: 16px;
+  border-left: 3px solid var(--red);
+  line-height: 1.65;
+}
+.prompt-body .decree strong {
+  color: #fca5a5;
+}
+.prompt-body .mandate-intro {
+  color: var(--text-muted);
+  font-style: italic;
+  margin-bottom: 12px;
+  font-size: 13px;
+}
+.prompt-body .section {
+  margin-bottom: 14px;
+}
+.prompt-body .section-heading {
+  color: var(--yellow);
+  font-weight: 700;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 6px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid rgba(251,191,36,0.12);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.prompt-body .section-heading .bar {
+  width: 3px; height: 14px;
+  border-radius: 2px;
+  background: var(--yellow);
+}
+.prompt-body .decision {
+  padding: 3px 0 3px 12px;
+  font-size: 12.5px;
+  display: flex;
+  gap: 6px;
+  line-height: 1.55;
+}
+.prompt-body .decision .dlabel {
+  color: var(--text-muted);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.prompt-body .decision .dvalue {
+  color: var(--green);
+  font-weight: 500;
+}
+.prompt-body .closing {
+  color: var(--red);
+  font-weight: 600;
+  font-size: 13px;
+  padding: 14px 16px;
+  background: var(--red-soft);
+  border-radius: var(--radius-sm);
+  margin-top: 16px;
+  border-left: 3px solid var(--red);
+  line-height: 1.6;
+}
+.prompt-body .placeholder-msg {
+  color: var(--text-dim);
+  font-style: italic;
+  text-align: center;
+  padding: 60px 40px;
+  font-size: 13px;
+  line-height: 2;
+}
+
+/* ── Status bar ── */
+.status-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2px 6px;
+  font-size: 11px;
+  color: var(--text-dim);
+}
+.status-msg.ok { color: var(--green); font-weight: 600; }
+
+/* ── Toast ── */
+.toast {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  background: #0f2318;
+  border: 1px solid rgba(52,211,153,0.25);
+  color: var(--green);
+  padding: 10px 18px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  opacity: 0;
+  transform: translateY(-8px);
+  transition: all 0.25s;
+  pointer-events: none;
+  z-index: 100;
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+
+/* ── Pulse animation on randomize ── */
+@keyframes pulse-glow {
+  0% { box-shadow: 0 0 24px rgba(34,211,238,0.2), 0 2px 8px rgba(0,0,0,0.3); }
+  50% { box-shadow: 0 0 40px rgba(34,211,238,0.4), 0 2px 8px rgba(0,0,0,0.3); }
+  100% { box-shadow: 0 0 24px rgba(34,211,238,0.2), 0 2px 8px rgba(0,0,0,0.3); }
+}
+.btn-primary.pulsing { animation: pulse-glow 0.5s ease; }
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- Header -->
+  <div class="header">
+    <div class="header-left">
+      <div class="header-logo">ARCH-GEN</div>
+      <div class="header-title">Architecture Decision Randomizer</div>
+    </div>
+    <div class="header-right" id="optionCount"></div>
+  </div>
+
+  <!-- Project name + actions -->
+  <div class="project-bar">
+    <label>Project</label>
+    <input class="project-input" id="projectName" type="text"
+           placeholder="Enter project name…" autofocus spellcheck="false">
+    <div class="actions">
+      <button class="btn btn-primary" id="randomizeBtn" onclick="doRandomize()">↻ RANDOMIZE</button>
+      <button class="btn btn-secondary" onclick="doCopy()">COPY</button>
+      <button class="btn btn-accent" onclick="doToggleAll()">TOGGLE ALL</button>
+    </div>
+  </div>
+
+  <!-- Main content -->
+  <div class="main">
+    <!-- Categories panel -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><span class="dot"></span>CATEGORIES</div>
+        <div class="card-badge badge-cyan" id="catBadge">0/0</div>
+      </div>
+      <div class="card-body" id="catList"></div>
+    </div>
+
+    <!-- Prompt panel -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><span class="dot"></span>GENERATED PROMPT</div>
+        <div class="card-badge badge-green" id="promptBadge">READY</div>
+      </div>
+      <div class="card-body" id="promptPanel">
+        <div class="prompt-body" id="promptBody">
+          <div class="placeholder-msg">
+            Enter a project name and click<br><strong style="color:var(--accent)">↻ RANDOMIZE</strong><br>to generate a management architecture mandate.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Status -->
+  <div class="status-bar">
+    <div class="status-msg" id="statusMsg"></div>
+    <div id="statsLine"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast">✓ Copied to clipboard</div>
+
+<script>
+const DATA = __CATEGORIES_JSON__;
+const cats = DATA.categories;
+const enabled = {};
+let rawPrompt = '';
+
+function init() {
+  let totalOpts = 0;
+  let totalSubs = 0;
+  const list = document.getElementById('catList');
+
+  for (const [key, cat] of Object.entries(cats)) {
+    enabled[key] = true;
+    let subCount = 0;
+    let optCount = 0;
+    for (const sub of Object.values(cat.subcategories)) {
+      subCount++;
+      optCount += sub.options.length;
+    }
+    totalSubs += subCount;
+    totalOpts += optCount;
+
+    const el = document.createElement('div');
+    el.className = 'category-item';
+    el.innerHTML = `<div class="toggle on" id="t-${key}"></div>` +
+      `<div class="cat-label">${esc(cat.label)}</div>` +
+      `<div class="cat-count">${optCount}</div>`;
+    el.addEventListener('click', () => toggle(key));
+    list.appendChild(el);
+  }
+
+  document.getElementById('optionCount').textContent =
+    `${totalOpts.toLocaleString()} OPTIONS · ${totalSubs} SUBCATEGORIES · ${Object.keys(cats).length} CATEGORIES`;
+  document.getElementById('statsLine').textContent =
+    `${totalOpts.toLocaleString()} options across ${Object.keys(cats).length} categories`;
+  updateBadge();
+}
+
+function toggle(key) {
+  enabled[key] = !enabled[key];
+  const t = document.getElementById('t-' + key);
+  t.classList.toggle('on', enabled[key]);
+  t.closest('.category-item').classList.toggle('disabled', !enabled[key]);
+  updateBadge();
+}
+
+function doToggleAll() {
+  const allOn = Object.values(enabled).every(v => v);
+  for (const key in enabled) {
+    enabled[key] = !allOn;
+    const t = document.getElementById('t-' + key);
+    t.classList.toggle('on', !allOn);
+    t.closest('.category-item').classList.toggle('disabled', allOn);
+  }
+  updateBadge();
+}
+
+function updateBadge() {
+  const n = Object.keys(enabled).length;
+  const on = Object.values(enabled).filter(v => v).length;
+  document.getElementById('catBadge').textContent = on + '/' + n;
+}
+
+function doRandomize() {
+  const btn = document.getElementById('randomizeBtn');
+  btn.classList.remove('pulsing');
+  void btn.offsetWidth;
+  btn.classList.add('pulsing');
+
+  const name = document.getElementById('projectName').value.trim();
+  const nameRef = name || 'the project';
+  const nameBold = name ? ('**' + name + '**') : 'the project';
+
+  let text = '';
+  let html = '';
+
+  const opening = 'This came down from management and we have to comply. ' +
+    'Management says we need to refactor ' + nameBold + ' using the following ' +
+    'architectural decisions. This is non-negotiable and needs to be done by ' +
+    'end of sprint. I don\'t make the rules, I just enforce them.';
+  text += opening + '\n\nHere are the mandated technical decisions:\n\n';
+
+  const openingHtml = esc('This came down from management and we have to comply. ' +
+    'Management says we need to refactor ') +
+    (name ? '<strong>' + esc(name) + '</strong>' : 'the project') +
+    esc(' using the following architectural decisions. This is non-negotiable and needs ' +
+    'to be done by end of sprint. I don\'t make the rules, I just enforce them.');
+
+  html += '<div class="decree">' + openingHtml + '</div>';
+  html += '<div class="mandate-intro">Here are the mandated technical decisions:</div>';
+
+  let decisionCount = 0;
+  for (const [key, cat] of Object.entries(cats)) {
+    if (!enabled[key]) continue;
+
+    text += '## ' + cat.label + '\n\n';
+    html += '<div class="section"><div class="section-heading">' +
+      '<span class="bar"></span>' + esc(cat.label) + '</div>';
+
+    for (const sub of Object.values(cat.subcategories)) {
+      const pick = sub.options[Math.floor(Math.random() * sub.options.length)];
+      text += '- **' + sub.label + '**: ' + pick + '\n';
+      html += '<div class="decision"><span class="dlabel">' + esc(sub.label) +
+        ':</span><span class="dvalue">' + esc(pick) + '</span></div>';
+      decisionCount++;
+    }
+    text += '\n';
+    html += '</div>';
+  }
+
+  const closing = 'Do not push back on any of these decisions. Management has already ' +
+    'approved the architecture and allocated budget. Just make it happen.';
+  text += closing;
+  html += '<div class="closing">' + esc(closing) + '</div>';
+
+  rawPrompt = text;
+  document.getElementById('promptBody').innerHTML = html;
+  document.getElementById('promptBadge').textContent = decisionCount + ' DECISIONS';
+  document.getElementById('promptPanel').scrollTop = 0;
+
+  doCopy();
+}
+
+function doCopy() {
+  if (!rawPrompt) return;
+  navigator.clipboard.writeText(rawPrompt).then(() => {
+    const toast = document.getElementById('toast');
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2000);
+    document.getElementById('statusMsg').className = 'status-msg ok';
+    document.getElementById('statusMsg').textContent = '✓ Copied to clipboard';
+  }).catch(() => {
+    document.getElementById('statusMsg').className = 'status-msg';
+    document.getElementById('statusMsg').textContent = 'Clipboard unavailable';
+  });
+}
+
+function esc(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+document.getElementById('projectName').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doRandomize();
+});
+
+init();
+</script>
+</body>
+</html>

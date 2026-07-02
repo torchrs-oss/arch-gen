@@ -1,0 +1,8 @@
+[package]
+name = "arch-gen"
+version = "0.2.0"
+edition = "2021"
+
+[dependencies]
+wry = "0.55"
+tao = "0.33"

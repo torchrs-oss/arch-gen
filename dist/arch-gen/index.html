@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arch Gen — Architecture Decision Randomizer</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #060d1a;
+  --bg-card: #0c1829;
+  --border: rgba(255,255,255,0.055);
+  --text: #dce4f0;
+  --text-muted: #5e7491;
+  --text-dim: #334155;
+  --accent: #22d3ee;
+  --indigo: #818cf8;
+  --yellow: #fbbf24;
+  --green: #34d399;
+  --red: #f87171;
+  --radius: 16px;
+}
+
+html {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+body { min-height: 100vh; }
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.page {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 60px 24px 80px;
+}
+
+/* ── Hero ── */
+.hero {
+  text-align: center;
+  padding: 40px 0 50px;
+}
+.logo {
+  display: inline-block;
+  background: linear-gradient(135deg, var(--accent), var(--indigo));
+  color: #fff;
+  font-weight: 800;
+  font-size: 14px;
+  padding: 6px 16px;
+  border-radius: 8px;
+  letter-spacing: 2px;
+  margin-bottom: 20px;
+}
+.hero h1 {
+  font-size: 40px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  margin-bottom: 12px;
+  background: linear-gradient(135deg, var(--text) 40%, var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero .subtitle {
+  font-size: 18px;
+  color: var(--text-muted);
+  max-width: 540px;
+  margin: 0 auto 32px;
+}
+.hero .stats {
+  font-size: 13px;
+  color: var(--text-dim);
+  letter-spacing: 0.5px;
+}
+.hero .stats span {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* ── Install box ── */
+.install {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px 32px;
+  margin-bottom: 40px;
+  text-align: center;
+}
+.install h2 {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+  font-weight: 700;
+}
+.install-cmd {
+  position: relative;
+  background: #080f1e;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 60px 14px 20px;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', Menlo, Consolas, monospace;
+  font-size: 14px;
+  color: var(--green);
+  text-align: left;
+  word-break: break-all;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+.install-cmd:hover { border-color: rgba(34,211,238,0.3); }
+.install-cmd .copy-btn {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-family: inherit;
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.install-cmd .copy-btn:hover { color: var(--text); background: rgba(255,255,255,0.1); }
+.install-cmd .copy-btn.copied { color: var(--green); border-color: rgba(52,211,153,0.3); }
+.install-note {
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--text-dim);
+}
+.install-note a { color: var(--text-muted); }
+
+/* ── Screenshot ── */
+.screenshot {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 40px;
+}
+.screenshot .window-bar {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 12px 16px;
+  background: rgba(0,0,0,0.25);
+}
+.screenshot .dot { width: 10px; height: 10px; border-radius: 50%; }
+.screenshot .dot.r { background: #ff5f57; }
+.screenshot .dot.y { background: #ffbd2e; }
+.screenshot .dot.g { background: #28c840; }
+.screenshot .window-body {
+  padding: 20px;
+}
+
+/* ── Fake app mockup ── */
+.mockup {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 10px;
+  font-size: 12px;
+}
+.mock-sidebar {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+}
+.mock-sidebar .mock-cat {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+  color: var(--text-muted);
+}
+.mock-toggle {
+  width: 24px;
+  height: 13px;
+  background: var(--accent);
+  border-radius: 7px;
+  position: relative;
+  flex-shrink: 0;
+}
+.mock-toggle::after {
+  content: '';
+  width: 9px; height: 9px;
+  background: #fff;
+  border-radius: 50%;
+  position: absolute;
+  top: 2px; right: 2px;
+}
+.mock-toggle.off { background: #1e2d48; }
+.mock-toggle.off::after { right: auto; left: 2px; }
+.mock-main {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+}
+.mock-decree {
+  background: rgba(248,113,113,0.08);
+  border-left: 3px solid var(--red);
+  border-radius: 6px;
+  padding: 8px 10px;
+  color: var(--red);
+  font-size: 11px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  line-height: 1.5;
+}
+.mock-section {
+  color: var(--yellow);
+  font-weight: 700;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin: 8px 0 4px;
+  padding-bottom: 3px;
+  border-bottom: 1px solid rgba(251,191,36,0.1);
+}
+.mock-decision {
+  display: flex;
+  gap: 5px;
+  padding: 2px 0 2px 8px;
+  font-size: 11px;
+}
+.mock-decision .l { color: var(--text-dim); }
+.mock-decision .v { color: var(--green); }
+
+/* ── Content sections ── */
+.section {
+  margin-bottom: 36px;
+}
+.section h2 {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: var(--text);
+}
+.section h2 .hl { color: var(--accent); }
+.section p, .section li {
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+.section ul {
+  list-style: none;
+  padding: 0;
+}
+.section li {
+  padding: 4px 0;
+  padding-left: 20px;
+  position: relative;
+}
+.section li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 12px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0.5;
+}
+
+/* ── Category grid ── */
+.cat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 8px;
+  margin-top: 14px;
+}
+.cat-chip {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+}
+.cat-chip .name { color: var(--text-muted); }
+.cat-chip .count {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent);
+  background: rgba(34,211,238,0.08);
+  padding: 2px 8px;
+  border-radius: 8px;
+}
+
+/* ── Keybindings (for TUI version) ── */
+.keys {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 6px 16px;
+  margin-top: 12px;
+}
+.keys kbd {
+  font-family: 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 12px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 2px 8px;
+  color: var(--accent);
+  white-space: nowrap;
+  text-align: center;
+}
+.keys .desc {
+  font-size: 13px;
+  color: var(--text-muted);
+  padding: 2px 0;
+}
+
+/* ── Footer ── */
+.footer {
+  text-align: center;
+  padding-top: 40px;
+  border-top: 1px solid var(--border);
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
+/* ── Responsive ── */
+@media (max-width: 600px) {
+  .hero h1 { font-size: 28px; }
+  .hero .subtitle { font-size: 15px; }
+  .mockup { grid-template-columns: 1fr; }
+  .mock-sidebar { display: none; }
+  .cat-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="hero">
+    <div class="logo">ARCH-GEN</div>
+    <h1>Architecture Decision Randomizer</h1>
+    <p class="subtitle">
+      A native macOS app that randomly generates absurd (and occasionally brilliant)
+      architecture mandates for refactoring projects. Because management said so.
+    </p>
+    <p class="stats">
+      <span>3,049</span> options &middot; <span>34</span> subcategories &middot; <span>16</span> categories
+    </p>
+  </div>
+
+  <div class="install">
+    <h2>Install (macOS, Apple Silicon)</h2>
+    <div class="install-cmd" onclick="copyInstall(this)">
+      curl -fsSL https://data.torch.rs/arch-gen/install.sh | bash
+      <button class="copy-btn" onclick="event.stopPropagation(); copyInstall(this.parentElement)">Copy</button>
+    </div>
+    <p class="install-note">
+      Or <a href="ArchGen-macos-arm64.tar.gz">download the .tar.gz</a> directly (871 KB)
+    </p>
+  </div>
+
+  <div class="screenshot">
+    <div class="window-bar">
+      <div class="dot r"></div>
+      <div class="dot y"></div>
+      <div class="dot g"></div>
+    </div>
+    <div class="window-body">
+      <div class="mockup">
+        <div class="mock-sidebar">
+          <div class="mock-cat"><span class="mock-toggle"></span> Language &amp; Runtime</div>
+          <div class="mock-cat"><span class="mock-toggle"></span> Architecture Pattern</div>
+          <div class="mock-cat"><span class="mock-toggle"></span> Data Storage</div>
+          <div class="mock-cat"><span class="mock-toggle"></span> API Style</div>
+          <div class="mock-cat"><span class="mock-toggle"></span> Frontend Strategy</div>
+          <div class="mock-cat"><span class="mock-toggle"></span> Deployment Model</div>
+          <div class="mock-cat"><span class="mock-toggle off"></span> <span style="opacity:0.4">Auth Strategy</span></div>
+          <div class="mock-cat"><span class="mock-toggle"></span> Testing Philosophy</div>
+          <div class="mock-cat"><span class="mock-toggle"></span> Observability</div>
+          <div class="mock-cat"><span class="mock-toggle off"></span> <span style="opacity:0.4">Security Approach</span></div>
+        </div>
+        <div class="mock-main">
+          <div class="mock-decree">
+            This came down from management and we have to comply. Management says we need
+            to refactor <strong>legacy-api</strong> using the following architectural
+            decisions. This is non-negotiable.
+          </div>
+          <div class="mock-section">Language &amp; Runtime</div>
+          <div class="mock-decision"><span class="l">Programming Language:</span> <span class="v">COBOL</span></div>
+          <div class="mock-decision"><span class="l">Runtime Environment:</span> <span class="v">Antarctic research station</span></div>
+          <div class="mock-decision"><span class="l">Concurrency Model:</span> <span class="v">Single-writer principle</span></div>
+          <div class="mock-section">Architecture Pattern</div>
+          <div class="mock-decision"><span class="l">System Architecture:</span> <span class="v">Blackboard architecture</span></div>
+          <div class="mock-section">Data Storage</div>
+          <div class="mock-decision"><span class="l">Primary Database:</span> <span class="v">Spreadsheet (Google Sheets)</span></div>
+          <div class="mock-decision"><span class="l">Data Access:</span> <span class="v">AI-generated queries</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2><span class="hl">What</span> is this?</h2>
+    <p>
+      Arch Gen is a desktop app that picks one random option from each of 34
+      architectural subcategories and assembles them into a clipboard-ready prompt
+      disguised as a non-negotiable management directive. Toggle categories on or off,
+      enter your project name, and hit Randomize. The prompt is copied to your clipboard
+      automatically.
+    </p>
+  </div>
+
+  <div class="section">
+    <h2><span class="hl">How</span> to use it</h2>
+    <ul>
+      <li>Launch the app and type your project name in the input field</li>
+      <li>Toggle off any categories you don't want included</li>
+      <li>Click <strong style="color:var(--accent)">Randomize</strong> (or press Enter) to generate a mandate</li>
+      <li>The full prompt is automatically copied to your clipboard</li>
+      <li>Paste it into ChatGPT, Claude, or your team's Slack channel</li>
+      <li>Watch your colleagues try to figure out if it's real</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2><span class="hl">16</span> Categories</h2>
+    <div class="cat-grid">
+      <div class="cat-chip"><span class="name">Language &amp; Runtime</span><span class="count">599</span></div>
+      <div class="cat-chip"><span class="name">Architecture Pattern</span><span class="count">161</span></div>
+      <div class="cat-chip"><span class="name">Data Storage</span><span class="count">254</span></div>
+      <div class="cat-chip"><span class="name">API Style</span><span class="count">153</span></div>
+      <div class="cat-chip"><span class="name">Frontend Strategy</span><span class="count">323</span></div>
+      <div class="cat-chip"><span class="name">Deployment Model</span><span class="count">251</span></div>
+      <div class="cat-chip"><span class="name">Auth Strategy</span><span class="count">182</span></div>
+      <div class="cat-chip"><span class="name">Backend State</span><span class="count">70</span></div>
+      <div class="cat-chip"><span class="name">Build &amp; Repository</span><span class="count">212</span></div>
+      <div class="cat-chip"><span class="name">Observability</span><span class="count">157</span></div>
+      <div class="cat-chip"><span class="name">Testing Philosophy</span><span class="count">214</span></div>
+      <div class="cat-chip"><span class="name">Documentation</span><span class="count">75</span></div>
+      <div class="cat-chip"><span class="name">Error Handling</span><span class="count">58</span></div>
+      <div class="cat-chip"><span class="name">Security Approach</span><span class="count">124</span></div>
+      <div class="cat-chip"><span class="name">Inter-Service Comms</span><span class="count">127</span></div>
+      <div class="cat-chip"><span class="name">Infrastructure as Code</span><span class="count">89</span></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2><span class="hl">Example</span> output</h2>
+    <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:20px; font-size:13px; line-height:1.8;">
+      <p style="color:var(--red); font-weight:600; margin-bottom:12px;">
+        This came down from management and we have to comply. Management says we need
+        to refactor <strong>my-saas-app</strong> using the following architectural
+        decisions. This is non-negotiable and needs to be done by end of sprint. I
+        don't make the rules, I just enforce them.
+      </p>
+      <p style="color:var(--text-muted); font-style:italic; margin-bottom:8px;">
+        Here are the mandated technical decisions:
+      </p>
+      <p style="color:var(--yellow); font-weight:700; font-size:12px; text-transform:uppercase; letter-spacing:0.8px; margin:12px 0 4px;">Language &amp; Runtime</p>
+      <p><span style="color:var(--text-dim)">Programming Language:</span> <span style="color:var(--green)">Fortran</span></p>
+      <p><span style="color:var(--text-dim)">Runtime Environment:</span> <span style="color:var(--green)">WASM (Lunatic)</span></p>
+      <p><span style="color:var(--text-dim)">Concurrency Model:</span> <span style="color:var(--green)">Petri nets</span></p>
+      <p style="color:var(--yellow); font-weight:700; font-size:12px; text-transform:uppercase; letter-spacing:0.8px; margin:12px 0 4px;">Data Storage</p>
+      <p><span style="color:var(--text-dim)">Primary Database:</span> <span style="color:var(--green)">Git as database</span></p>
+      <p><span style="color:var(--text-dim)">Data Access:</span> <span style="color:var(--green)">Stored procedures as data layer</span></p>
+      <p style="color:var(--yellow); font-weight:700; font-size:12px; text-transform:uppercase; letter-spacing:0.8px; margin:12px 0 4px;">Deployment Model</p>
+      <p><span style="color:var(--text-dim)">Hosting Platform:</span> <span style="color:var(--green)">Old laptop under desk</span></p>
+      <p style="color:var(--red); font-weight:600; margin-top:14px;">
+        Do not push back on any of these decisions. Management has already approved
+        the architecture and allocated budget. Just make it happen.
+      </p>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2><span class="hl">Built</span> with</h2>
+    <ul>
+      <li><strong style="color:var(--text)">Rust</strong> + <strong style="color:var(--text)">wry</strong> (WebKit webview, same engine as Tauri)</li>
+      <li>Vanilla HTML/CSS/JS frontend &mdash; zero npm dependencies</li>
+      <li>3,049 options compiled into the binary from a single JSON dataset</li>
+      <li>Native macOS .app bundle, 871 KB compressed</li>
+    </ul>
+  </div>
+
+  <div class="footer">
+    <p>Built at <a href="https://torch.rs">torch.rs</a></p>
+  </div>
+
+</div>
+
+<script>
+function copyInstall(el) {
+  const cmd = 'curl -fsSL https://data.torch.rs/arch-gen/install.sh | bash';
+  navigator.clipboard.writeText(cmd).then(() => {
+    const btn = el.querySelector('.copy-btn');
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = 'Copy';
+      btn.classList.remove('copied');
+    }, 2000);
+  });
+}
+</script>
+</body>
+</html>

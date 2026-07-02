@@ -1,0 +1,27 @@
+# Rust / Cargo
+/target/
+**/*.rs.bk
+*.pdb
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+.Spotlight-V100
+.Trashes
+
+# App bundles (built artifacts)
+*.app/
+*.dmg
+*.pkg
+
+# Distribution binaries
+dist/**/*.tar.gz
+dist/**/*.zip
+
+# Tauri
+/src-tauri/target/
+/src-tauri/WixTools/
+/src-tauri/icons/icon.ico
