@@ -1,9 +1,10 @@
 [Desktop Entry]
 Name=Arch Gen
 Comment=Architecture Decision Randomizer
-Exec=arch-gen
+Exec=__EXEC_PATH__
 Icon=arch-gen
 Terminal=false
 Type=Application
 Categories=Development;Utility;
 Keywords=architecture;randomizer;refactor;management;
+StartupWMClass=arch-gen

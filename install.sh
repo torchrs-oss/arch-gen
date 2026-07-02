@@ -59,7 +59,7 @@ case "$OS" in
         echo "Installing desktop entry and icon..."
         mkdir -p "$ICON_DIR" "$DESKTOP_DIR"
         cp "$TMP_DIR/arch-gen.svg" "$ICON_DIR/arch-gen.svg"
-        cp "$TMP_DIR/arch-gen.desktop" "$DESKTOP_DIR/arch-gen.desktop"
+        sed "s|__EXEC_PATH__|$BIN_DIR/arch-gen|" "$TMP_DIR/arch-gen.desktop" > "$DESKTOP_DIR/arch-gen.desktop"
 
         if command -v update-desktop-database &>/dev/null; then
             update-desktop-database "$DESKTOP_DIR" 2>/dev/null || true
