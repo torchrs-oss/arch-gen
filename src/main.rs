@@ -33,27 +33,31 @@ fn main() -> wry::Result<()> {
 
     let menu = Menu::new();
 
-    let app_menu = Submenu::new("Arch Gen", true);
-    app_menu
-        .append_items(&[
-            &PredefinedMenuItem::about(
-                None,
-                Some(AboutMetadata {
-                    name: Some("Arch Gen".into()),
-                    version: Some(env!("CARGO_PKG_VERSION").into()),
-                    ..Default::default()
-                }),
-            ),
-            &PredefinedMenuItem::separator(),
-            &PredefinedMenuItem::services(None),
-            &PredefinedMenuItem::separator(),
-            &PredefinedMenuItem::hide(None),
-            &PredefinedMenuItem::hide_others(None),
-            &PredefinedMenuItem::show_all(None),
-            &PredefinedMenuItem::separator(),
-            &PredefinedMenuItem::quit(None),
-        ])
-        .unwrap();
+    #[cfg(target_os = "macos")]
+    {
+        let app_menu = Submenu::new("Arch Gen", true);
+        app_menu
+            .append_items(&[
+                &PredefinedMenuItem::about(
+                    None,
+                    Some(AboutMetadata {
+                        name: Some("Arch Gen".into()),
+                        version: Some(env!("CARGO_PKG_VERSION").into()),
+                        ..Default::default()
+                    }),
+                ),
+                &PredefinedMenuItem::separator(),
+                &PredefinedMenuItem::services(None),
+                &PredefinedMenuItem::separator(),
+                &PredefinedMenuItem::hide(None),
+                &PredefinedMenuItem::hide_others(None),
+                &PredefinedMenuItem::show_all(None),
+                &PredefinedMenuItem::separator(),
+                &PredefinedMenuItem::quit(None),
+            ])
+            .unwrap();
+        menu.append(&app_menu).unwrap();
+    }
 
     let edit_menu = Submenu::new("Edit", true);
     edit_menu
@@ -78,14 +82,14 @@ fn main() -> wry::Result<()> {
         ])
         .unwrap();
 
-    menu.append_items(&[&app_menu, &edit_menu, &window_menu])
-        .unwrap();
+    menu.append_items(&[&edit_menu, &window_menu]).unwrap();
 
     #[cfg(target_os = "macos")]
     {
         menu.init_for_nsapp();
         window_menu.set_as_windows_menu_for_nsapp();
     }
+
 
     let _webview = WebViewBuilder::new()
         .with_html(&html)
