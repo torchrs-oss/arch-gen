@@ -245,6 +245,67 @@ html, body {
   font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
+.category-item .expand-arrow {
+  font-size: 9px;
+  color: var(--text-dim);
+  transition: transform 0.2s;
+  width: 14px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.category-item .expand-arrow.open { transform: rotate(90deg); }
+
+/* ── Subcategory tree ── */
+.sub-list {
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.25s ease;
+}
+.sub-list.open { max-height: 2000px; }
+.sub-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px 4px 40px;
+  cursor: pointer;
+  transition: background 0.12s;
+  border-radius: var(--radius-xs);
+}
+.sub-item:hover { background: rgba(255,255,255,0.02); }
+.sub-item.disabled { opacity: 0.35; }
+.sub-item .sub-label {
+  flex: 1;
+  font-size: 11.5px;
+  font-weight: 400;
+  color: var(--text-muted);
+}
+.sub-item .sub-count {
+  font-size: 9px;
+  color: var(--text-dim);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.toggle-sm {
+  width: 26px;
+  height: 14px;
+  background: #1e2d48;
+  border-radius: 7px;
+  position: relative;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+.toggle-sm.on { background: var(--indigo); }
+.toggle-sm::after {
+  content: '';
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: #fff;
+  position: absolute;
+  top: 2px; left: 2px;
+  transition: transform 0.2s cubic-bezier(0.4,0,0.2,1);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+.toggle-sm.on::after { transform: translateX(12px); }
 
 /* ── Toggle switch ── */
 .toggle {
@@ -456,6 +517,7 @@ html, body {
 const DATA = __CATEGORIES_JSON__;
 const cats = DATA.categories;
 const enabled = {};
+const subEnabled = {};
 let rawPrompt = '';
 
 function init() {
@@ -465,22 +527,49 @@ function init() {
 
   for (const [key, cat] of Object.entries(cats)) {
     enabled[key] = true;
+    subEnabled[key] = {};
     let subCount = 0;
     let optCount = 0;
-    for (const sub of Object.values(cat.subcategories)) {
+    for (const [subKey, sub] of Object.entries(cat.subcategories)) {
+      subEnabled[key][subKey] = true;
       subCount++;
       optCount += sub.options.length;
     }
     totalSubs += subCount;
     totalOpts += optCount;
 
+    const wrapper = document.createElement('div');
+
     const el = document.createElement('div');
     el.className = 'category-item';
     el.innerHTML = `<div class="toggle on" id="t-${key}"></div>` +
       `<div class="cat-label">${esc(cat.label)}</div>` +
-      `<div class="cat-count">${optCount}</div>`;
-    el.addEventListener('click', () => toggle(key));
-    list.appendChild(el);
+      `<div class="cat-count">${optCount}</div>` +
+      `<div class="expand-arrow" id="arrow-${key}">▶</div>`;
+    el.addEventListener('click', (e) => {
+      if (e.target.closest('.expand-arrow')) {
+        toggleExpand(key);
+      } else {
+        toggle(key);
+      }
+    });
+    wrapper.appendChild(el);
+
+    const subList = document.createElement('div');
+    subList.className = 'sub-list';
+    subList.id = 'subs-' + key;
+    for (const [subKey, sub] of Object.entries(cat.subcategories)) {
+      const subEl = document.createElement('div');
+      subEl.className = 'sub-item';
+      subEl.innerHTML = `<div class="toggle-sm on" id="ts-${key}-${subKey}"></div>` +
+        `<div class="sub-label">${esc(sub.label)}</div>` +
+        `<div class="sub-count">${sub.options.length}</div>`;
+      subEl.addEventListener('click', () => toggleSub(key, subKey));
+      subList.appendChild(subEl);
+    }
+    wrapper.appendChild(subList);
+
+    list.appendChild(wrapper);
   }
 
   document.getElementById('optionCount').textContent =
@@ -490,29 +579,68 @@ function init() {
   updateBadge();
 }
 
+function toggleExpand(key) {
+  const subs = document.getElementById('subs-' + key);
+  const arrow = document.getElementById('arrow-' + key);
+  subs.classList.toggle('open');
+  arrow.classList.toggle('open');
+}
+
 function toggle(key) {
   enabled[key] = !enabled[key];
   const t = document.getElementById('t-' + key);
   t.classList.toggle('on', enabled[key]);
   t.closest('.category-item').classList.toggle('disabled', !enabled[key]);
+  for (const subKey in subEnabled[key]) {
+    subEnabled[key][subKey] = enabled[key];
+    const ts = document.getElementById('ts-' + key + '-' + subKey);
+    ts.classList.toggle('on', enabled[key]);
+    ts.closest('.sub-item').classList.toggle('disabled', !enabled[key]);
+  }
+  updateBadge();
+}
+
+function toggleSub(key, subKey) {
+  subEnabled[key][subKey] = !subEnabled[key][subKey];
+  const ts = document.getElementById('ts-' + key + '-' + subKey);
+  ts.classList.toggle('on', subEnabled[key][subKey]);
+  ts.closest('.sub-item').classList.toggle('disabled', !subEnabled[key][subKey]);
+  const anySub = Object.values(subEnabled[key]).some(v => v);
+  enabled[key] = anySub;
+  const t = document.getElementById('t-' + key);
+  t.classList.toggle('on', anySub);
+  t.closest('.category-item').classList.toggle('disabled', !anySub);
   updateBadge();
 }
 
 function doToggleAll() {
-  const allOn = Object.values(enabled).every(v => v);
+  const allOn = Object.values(enabled).every(v => v) &&
+    Object.values(subEnabled).every(subs => Object.values(subs).every(v => v));
   for (const key in enabled) {
     enabled[key] = !allOn;
     const t = document.getElementById('t-' + key);
     t.classList.toggle('on', !allOn);
     t.closest('.category-item').classList.toggle('disabled', allOn);
+    for (const subKey in subEnabled[key]) {
+      subEnabled[key][subKey] = !allOn;
+      const ts = document.getElementById('ts-' + key + '-' + subKey);
+      ts.classList.toggle('on', !allOn);
+      ts.closest('.sub-item').classList.toggle('disabled', allOn);
+    }
   }
   updateBadge();
 }
 
 function updateBadge() {
-  const n = Object.keys(enabled).length;
-  const on = Object.values(enabled).filter(v => v).length;
-  document.getElementById('catBadge').textContent = on + '/' + n;
+  let totalSubs = 0;
+  let onSubs = 0;
+  for (const key in subEnabled) {
+    for (const subKey in subEnabled[key]) {
+      totalSubs++;
+      if (subEnabled[key][subKey]) onSubs++;
+    }
+  }
+  document.getElementById('catBadge').textContent = onSubs + '/' + totalSubs;
 }
 
 function doRandomize() {
@@ -547,19 +675,24 @@ function doRandomize() {
   for (const [key, cat] of Object.entries(cats)) {
     if (!enabled[key]) continue;
 
-    text += '## ' + cat.label + '\n\n';
-    html += '<div class="section"><div class="section-heading">' +
-      '<span class="bar"></span>' + esc(cat.label) + '</div>';
+    let sectionText = '';
+    let sectionHtml = '';
+    let hasSub = false;
 
-    for (const sub of Object.values(cat.subcategories)) {
+    for (const [subKey, sub] of Object.entries(cat.subcategories)) {
+      if (!subEnabled[key][subKey]) continue;
       const pick = sub.options[Math.floor(Math.random() * sub.options.length)];
-      text += '- **' + sub.label + '**: ' + pick + '\n';
-      html += '<div class="decision"><span class="dlabel">' + esc(sub.label) +
+      sectionText += '- **' + sub.label + '**: ' + pick + '\n';
+      sectionHtml += '<div class="decision"><span class="dlabel">' + esc(sub.label) +
         ':</span><span class="dvalue">' + esc(pick) + '</span></div>';
       decisionCount++;
+      hasSub = true;
     }
-    text += '\n';
-    html += '</div>';
+
+    if (!hasSub) continue;
+    text += '## ' + cat.label + '\n\n' + sectionText + '\n';
+    html += '<div class="section"><div class="section-heading">' +
+      '<span class="bar"></span>' + esc(cat.label) + '</div>' + sectionHtml + '</div>';
   }
 
   const closing = 'Do not push back on any of these decisions. Management has already ' +
