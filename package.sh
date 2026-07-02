@@ -57,3 +57,7 @@ case "${1:-all}" in
     all)    package_macos; package_linux ;;
     *)      echo "Usage: $0 [macos|linux|all]"; exit 1 ;;
 esac
+
+cp install.sh "$DIST_DIR/install.sh"
+cp dist/arch-gen/index.html "$DIST_DIR/index.html" 2>/dev/null || true
+echo "Synced install.sh → $DIST_DIR/"
