@@ -7,4 +7,4 @@ Terminal=false
 Type=Application
 Categories=Development;Utility;
 Keywords=architecture;randomizer;refactor;management;
-StartupWMClass=arch-gen
+StartupWMClass=rs.torch.arch-gen

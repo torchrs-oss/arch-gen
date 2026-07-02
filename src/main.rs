@@ -8,16 +8,33 @@ use tao::{
 };
 use wry::WebViewBuilder;
 
+#[cfg(target_os = "linux")]
+use tao::platform::unix::{EventLoopBuilderExtUnix, WindowExtUnix};
+#[cfg(target_os = "linux")]
+use wry::WebViewBuilderExtUnix;
+
+#[cfg(target_os = "linux")]
+const APP_ID: &str = "rs.torch.arch-gen";
+
 enum UserEvent {
     MenuEvent(MenuEvent),
 }
 
 fn main() -> wry::Result<()> {
+    #[cfg(target_os = "linux")]
+    if std::env::var_os("WEBKIT_DISABLE_DMABUF_RENDERER").is_none() {
+        // Work around WebKitGTK Wayland DMABUF protocol error (blank window).
+        std::env::set_var("WEBKIT_DISABLE_DMABUF_RENDERER", "1");
+    }
+
     let categories_json = include_str!("../categories.json");
     let html_template = include_str!("ui.html");
     let html = html_template.replace("__CATEGORIES_JSON__", categories_json);
 
-    let event_loop = EventLoopBuilder::<UserEvent>::with_user_event().build();
+    let mut event_loop_builder = EventLoopBuilder::<UserEvent>::with_user_event();
+    #[cfg(target_os = "linux")]
+    event_loop_builder.with_app_id(APP_ID);
+    let event_loop = event_loop_builder.build();
 
     let proxy = event_loop.create_proxy();
     MenuEvent::set_event_handler(Some(move |event| {
@@ -91,7 +108,7 @@ fn main() -> wry::Result<()> {
     }
 
 
-    let _webview = WebViewBuilder::new()
+    let builder = WebViewBuilder::new()
         .with_html(&html)
         .with_devtools(cfg!(debug_assertions))
         .with_ipc_handler(|req| {
@@ -101,8 +118,12 @@ fn main() -> wry::Result<()> {
                     let _ = cb.set_text(text);
                 }
             }
-        })
-        .build(&window)?;
+        });
+
+    #[cfg(not(target_os = "linux"))]
+    let _webview = builder.build(&window)?;
+    #[cfg(target_os = "linux")]
+    let _webview = builder.build_gtk(window.default_vbox().unwrap())?;
 
     event_loop.run(move |event, _, control_flow| {
         *control_flow = ControlFlow::Wait;

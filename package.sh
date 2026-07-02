@@ -42,11 +42,11 @@ package_linux() {
 
     docker run --platform linux/amd64 --rm -v "$TMP_DIR:/output" arch-gen-linux
 
-    cp linux/arch-gen.desktop "$TMP_DIR/"
+    cp linux/rs.torch.arch-gen.desktop "$TMP_DIR/"
     cp linux/arch-gen.svg "$TMP_DIR/"
 
     echo "Creating $TAR_NAME..."
-    tar -czf "$DIST_DIR/$TAR_NAME" -C "$TMP_DIR" arch-gen arch-gen.desktop arch-gen.svg
+    tar -czf "$DIST_DIR/$TAR_NAME" -C "$TMP_DIR" arch-gen rs.torch.arch-gen.desktop arch-gen.svg
 
     echo "Done: $DIST_DIR/$TAR_NAME ($(du -h "$DIST_DIR/$TAR_NAME" | cut -f1))"
 }

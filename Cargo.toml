@@ -4,7 +4,7 @@ version = "0.2.0"
 edition = "2021"
 
 [dependencies]
-wry = { version = "0.55", features = ["x11"] }
+wry = "0.55"
 tao = "0.33"
 muda = "0.19.3"
 arboard = "3.6.1"

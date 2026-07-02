@@ -45,6 +45,7 @@ case "$OS" in
         BIN_DIR="$HOME/.local/bin"
         ICON_DIR="$HOME/.local/share/icons/hicolor/scalable/apps"
         DESKTOP_DIR="$HOME/.local/share/applications"
+        DESKTOP_FILE="rs.torch.arch-gen.desktop"
 
         echo "Downloading Arch Gen for Linux..."
         curl -fSL "$URL" -o "$TMP_DIR/ArchGen.tar.gz"
@@ -59,7 +60,7 @@ case "$OS" in
         echo "Installing desktop entry and icon..."
         mkdir -p "$ICON_DIR" "$DESKTOP_DIR"
         cp "$TMP_DIR/arch-gen.svg" "$ICON_DIR/arch-gen.svg"
-        sed "s|__EXEC_PATH__|$BIN_DIR/arch-gen|" "$TMP_DIR/arch-gen.desktop" > "$DESKTOP_DIR/arch-gen.desktop"
+        sed "s|__EXEC_PATH__|$BIN_DIR/arch-gen|" "$TMP_DIR/$DESKTOP_FILE" > "$DESKTOP_DIR/$DESKTOP_FILE"
 
         if command -v update-desktop-database &>/dev/null; then
             update-desktop-database "$DESKTOP_DIR" 2>/dev/null || true
@@ -67,6 +68,13 @@ case "$OS" in
         if command -v gtk-update-icon-cache &>/dev/null; then
             gtk-update-icon-cache -f -t "$HOME/.local/share/icons/hicolor" 2>/dev/null || true
         fi
+
+        echo
+        echo "Note: Arch Gen requires WebKitGTK 4.1 at runtime."
+        echo "  Arch/Manjaro: sudo pacman -S webkit2gtk-4.1"
+        echo "  Debian/Ubuntu: sudo apt install libwebkit2gtk-4.1-0"
+        echo "  Fedora: sudo dnf install webkit2gtk4.1"
+        echo
 
         echo "Done. Arch Gen should appear in your app launcher."
         if ! echo "$PATH" | grep -q "$BIN_DIR"; then

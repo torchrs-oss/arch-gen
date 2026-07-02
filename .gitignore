@@ -21,6 +21,9 @@ Icon?
 dist/**/*.tar.gz
 dist/**/*.zip
 
+# Stray copy at dist root (real install.sh lives at dist/arch-gen/)
+/dist/install.sh
+
 # Tauri
 /src-tauri/target/
 /src-tauri/WixTools/
