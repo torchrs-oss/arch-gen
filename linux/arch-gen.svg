@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0c1829"/>
+      <stop offset="100%" stop-color="#0a1220"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#22d3ee"/>
+      <stop offset="100%" stop-color="#6366f1"/>
+    </linearGradient>
+    <linearGradient id="glow" x1="0.5" y1="0" x2="0.5" y2="1">
+      <stop offset="0%" stop-color="#22d3ee" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#6366f1" stop-opacity="0.05"/>
+    </linearGradient>
+    <linearGradient id="die-face" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1a2d4d"/>
+      <stop offset="100%" stop-color="#0f1d35"/>
+    </linearGradient>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="8" stdDeviation="20" flood-color="#000" flood-opacity="0.5"/>
+    </filter>
+    <filter id="glow-filter">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="12" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Rounded square background -->
+  <rect width="1024" height="1024" rx="220" fill="url(#bg)"/>
+
+  <!-- Subtle border -->
+  <rect x="3" y="3" width="1018" height="1018" rx="218" fill="none" stroke="url(#accent)" stroke-width="3" opacity="0.25"/>
+
+  <!-- Background glow -->
+  <ellipse cx="512" cy="400" rx="350" ry="300" fill="url(#glow)"/>
+
+  <!-- Die body - isometric cube -->
+  <g filter="shadow" transform="translate(512, 480)">
+    <!-- Top face -->
+    <polygon points="0,-200 200,-100 0,0 -200,-100" fill="#1e3355" stroke="url(#accent)" stroke-width="2.5" opacity="0.9"/>
+    <!-- Left face -->
+    <polygon points="-200,-100 0,0 0,200 -200,100" fill="#142445" stroke="url(#accent)" stroke-width="2.5" opacity="0.7"/>
+    <!-- Right face -->
+    <polygon points="200,-100 0,0 0,200 200,100" fill="#0f1d35" stroke="url(#accent)" stroke-width="2.5" opacity="0.8"/>
+
+    <!-- Dots on top face - showing "random" pattern (3 dots) -->
+    <g filter="glow-filter">
+      <circle cx="-60" cy="-160" r="16" fill="#22d3ee"/>
+      <circle cx="0" cy="-100" r="16" fill="#22d3ee"/>
+      <circle cx="60" cy="-40" r="16" fill="#22d3ee"/>
+    </g>
+
+    <!-- Dots on left face (2 dots) -->
+    <g filter="glow-filter">
+      <circle cx="-140" cy="-20" r="14" fill="#818cf8"/>
+      <circle cx="-60" cy="60" r="14" fill="#818cf8"/>
+    </g>
+
+    <!-- Dots on right face (4 dots) -->
+    <g filter="glow-filter">
+      <circle cx="60" cy="-40" r="13" fill="#a78bfa" opacity="0.8"/>
+      <circle cx="140" cy="-20" r="13" fill="#a78bfa" opacity="0.8"/>
+      <circle cx="60" cy="60" r="13" fill="#a78bfa" opacity="0.8"/>
+      <circle cx="140" cy="80" r="13" fill="#a78bfa" opacity="0.8"/>
+    </g>
+  </g>
+
+  <!-- Circular arrows around the die (randomize symbol) -->
+  <g transform="translate(512, 480)" fill="none" stroke="url(#accent)" stroke-width="10" stroke-linecap="round" opacity="0.6">
+    <!-- Top-right arc -->
+    <path d="M 160,-240 A 300,300 0 0,1 280,-40"/>
+    <!-- Arrow head -->
+    <polygon points="280,-40 260,-80 300,-70" fill="url(#accent)" stroke="none"/>
+
+    <!-- Bottom-left arc -->
+    <path d="M -160,240 A 300,300 0 0,1 -280,40"/>
+    <!-- Arrow head -->
+    <polygon points="-280,40 -260,80 -300,70" fill="url(#accent)" stroke="none"/>
+  </g>
+
+  <!-- Small gear/cog accent top-right -->
+  <g transform="translate(780, 200)" opacity="0.3" fill="url(#accent)">
+    <circle cx="0" cy="0" r="30" fill="none" stroke="url(#accent)" stroke-width="8"/>
+    <rect x="-4" y="-44" width="8" height="16" rx="3"/>
+    <rect x="-4" y="28" width="8" height="16" rx="3"/>
+    <rect x="28" y="-4" width="16" height="8" rx="3"/>
+    <rect x="-44" y="-4" width="16" height="8" rx="3"/>
+    <rect x="18" y="-32" width="8" height="14" rx="3" transform="rotate(45, 22, -25)"/>
+    <rect x="-26" y="18" width="8" height="14" rx="3" transform="rotate(45, -22, 25)"/>
+    <rect x="18" y="18" width="8" height="14" rx="3" transform="rotate(-45, 22, 25)"/>
+    <rect x="-26" y="-32" width="8" height="14" rx="3" transform="rotate(-45, -22, -25)"/>
+  </g>
+
+  <!-- "ARCH" text at bottom -->
+  <text x="512" y="820" text-anchor="middle" font-family="-apple-system, 'SF Pro Display', 'Helvetica Neue', sans-serif" font-size="80" font-weight="800" letter-spacing="12" fill="url(#accent)">ARCH</text>
+  <text x="512" y="870" text-anchor="middle" font-family="-apple-system, 'SF Pro Display', 'Helvetica Neue', sans-serif" font-size="36" font-weight="500" letter-spacing="8" fill="#5e7491">GEN</text>
+</svg>
