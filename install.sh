@@ -12,6 +12,7 @@ echo "Downloading Arch Gen..."
 curl -fSL "$URL" -o "$TMP_DIR/ArchGen.tar.gz"
 
 echo "Installing to $INSTALL_DIR..."
+pkill -f "Arch Gen" 2>/dev/null || true
 mkdir -p "$INSTALL_DIR"
 rm -rf "$INSTALL_DIR/$APP_NAME.app"
 tar -xzf "$TMP_DIR/ArchGen.tar.gz" -C "$INSTALL_DIR"
